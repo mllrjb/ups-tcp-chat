@@ -1,0 +1,23 @@
+{
+  "name": "ups-tcp-chat",
+  "version": "1.0.0",
+  "description": "TCP Chat server for UPS PLC testing",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "index.js"
+  },
+  "author": "Jason Miller <jason@millerjb.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "findup": "^0.1.5",
+    "gulp": "^3.9.1",
+    "gulp-load-plugins": "^1.2.4",
+    "gulp-mocha": "^2.2.0",
+    "mocha": "^2.5.3",
+    "mocha-junit-reporter": "^1.11.1",
+    "portastic": "^1.0.1",
+    "yargs": "^4.8.0"
+  }
+}
