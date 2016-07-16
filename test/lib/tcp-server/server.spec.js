@@ -9,6 +9,8 @@ const tcpServer = sut('lib/tcp-server/server')
   }
   , localhost = '127.0.0.1';
 
+  // TODO: server write to client
+
 describe('TCP Chat Server', () => {
 
   var port;
