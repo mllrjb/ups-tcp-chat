@@ -13,6 +13,7 @@
     "chai": "^3.5.0",
     "findup": "^0.1.5",
     "gulp": "^3.9.1",
+    "gulp-istanbul": "^1.0.0",
     "gulp-load-plugins": "^1.2.4",
     "gulp-mocha": "^2.2.0",
     "mocha": "^2.5.3",
