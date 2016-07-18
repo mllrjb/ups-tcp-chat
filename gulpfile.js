@@ -5,11 +5,16 @@ const gulp = require('gulp')
   , istanbul = require('gulp-istanbul')
   , yargs = require('yargs')
   , chai = require('chai')
+  , sinon = require('sinon')
+  , sinonChai = require('sinon-chai')
   , path = require('path');
+
+chai.use(sinonChai);
 
 function runMocha(done) {
   return function() {
     global.expect = chai.expect;
+    global.sinon = sinon;
     global.sut = function(sutPath) {
       return require(path.join(__dirname, sutPath));
     };

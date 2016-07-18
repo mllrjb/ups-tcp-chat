@@ -1,7 +1,17 @@
-var tcpServer = require('./lib/tcp-server/server.js');
+const TcpServer = require('./lib/tcp/tcp-server.js');
 
-var TCP_CHAT_PORT = 9001;
+const TCP_CHAT_PORT = 9001;
 
-tcpServer.listen(TCP_CHAT_PORT, function() {
-  console.log('TCP server listening at localhost:' + TCP_CHAT_PORT);
+var tcpServer = new TcpServer({
+  port: TCP_CHAT_PORT
+});
+
+tcpServer.on('connected', () => {
+  console.log('TCP server listening at localhost:' + TCP_CHAT_PORT);  
+});
+
+tcpServer.on('client', (client) => {
+  client.on('message', (msg) => {
+    console.log(client._id + ': ' + msg);
+  });
 });
