@@ -7,7 +7,8 @@ const gulp = require('gulp')
   , chai = require('chai')
   , sinon = require('sinon')
   , sinonChai = require('sinon-chai')
-  , path = require('path');
+  , path = require('path')
+  , winston = require('winston');
 
 chai.use(sinonChai);
 
@@ -23,6 +24,11 @@ function runMocha(done) {
       grep: yargs.argv.grep,
       reporter: 'spec'
     };
+
+    // silence logging :)
+    if (!yargs.argv.debug) {
+      winston.remove(winston.transports.Console);
+    }
 
     var stream = gulp.src('test/lib/**/*spec.js')
       .pipe(plugins.mocha(mochaOpts));

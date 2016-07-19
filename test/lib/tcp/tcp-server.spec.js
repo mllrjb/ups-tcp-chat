@@ -3,12 +3,12 @@
 const TcpServer = sut('lib/tcp/tcp-server')
   , net = require('net')
   , portastic = require('portastic')
-  , TestClient = require('./test-tcp-client')
-  , portRange = {
-    min: 8000,
-    max: 9000
-  }
-  , localhost = '127.0.0.1';
+  , async = require('async');
+
+const portRange = {
+  min: 8000,
+  max: 9000
+};
 
 // TODO: server write to client
 
@@ -38,7 +38,7 @@ describe('TCP Chat Server', () => {
     });
   });
 
-  describe(': client', () => {
+  describe(': client connection', () => {
 
     var server;
 
@@ -56,8 +56,7 @@ describe('TCP Chat Server', () => {
 
     it('client can connect and close', (done) => {
       const client = net.connect({
-        port: port,
-        host: localhost
+        port: port
       }, () => {
         client.end();
       });
@@ -69,15 +68,13 @@ describe('TCP Chat Server', () => {
 
     it('multiple clients can connect', (done) => {
       const client1 = net.connect({
-        port: port,
-        host: localhost
+        port: port
       }, () => {
         client1.end();
       });
 
       const client2 = net.connect({
-        port: port,
-        host: localhost
+        port: port
       }, () => {
         client2.end();
       });
@@ -99,6 +96,107 @@ describe('TCP Chat Server', () => {
       });
     });
 
+  });
+
+  describe(': messages', () => {
+
+    var server;
+
+    beforeEach(done => {
+      server = new TcpServer({
+        port: port
+      });
+      server.on('connected', done);
+    });
+
+    afterEach(done => {
+      server.on('disconnected', done);
+      server.disconnect();
+    });
+
+    it('should send', (done) => {
+      var spy = sinon.spy()
+        , socket;
+
+      async.waterfall([
+          (cb) => {
+            server.on('client', client => {
+              cb(null, socket, client);
+            });
+            socket = net.connect({
+              port: port
+            });
+          },
+          (socket, client, cb) => {
+            client.on('message', msg => {
+              expect(msg).to.equal('some message');
+              cb(null, socket);
+            });
+            socket.write('some message\r\n');
+          }
+        ], (err, socket) => {
+          socket.on('close', done);
+          socket.end();
+        });
+    });
+
+    it('should receive', (done) => {
+      var spy = sinon.spy()
+        , socket;
+
+      async.waterfall([
+          (cb) => {
+            server.on('client', client => {
+              cb(null, socket, client);
+            });
+            socket = net.connect({
+              port: port
+            });
+            socket.setEncoding('UTF-8');
+          },
+          (socket, client, cb) => {
+            socket.on('data', data => {
+              expect(data).to.equal('some other message\r\n');
+              cb(null, socket);
+            });
+            client.send('some other message');
+          }
+        ], (err, socket) => {
+          socket.on('close', done);
+          socket.end();
+        });
+    });
+
+    it('should send and receive', (done) => {
+      async.waterfall([
+          (cb) => {
+            server.on('client', client => {
+              cb(null, socket, client);
+            });
+            var socket = net.connect({
+              port: port
+            });
+            socket.setEncoding('UTF-8');
+          },
+          (socket, client, cb) => {
+            client.on('message', msg => {
+              cb(null, socket, client, msg);
+            });
+            socket.write('some message\r\n');
+          },
+          (socket, client, message, cb) => {
+            expect(message).to.equal('some message');
+            socket.on('data', data => {
+              expect(data).to.equal('some other message\r\n');
+              cb(null, socket);
+            });
+            client.send('some other message');
+          }
+        ], (err, socket) => {
+          socket.on('close', done);
+          socket.end();
+        });
+    });
   });
 
 });
