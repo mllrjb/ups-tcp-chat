@@ -6,3 +6,9 @@ server:
 logger:
   # possible values: error, warn, info, debug, trace
   level: 'info' 
+
+destination:
+  loop: true
+  sequence:
+    - '5 00002,00003,00004'
+    - '* 00012,00013,00014'

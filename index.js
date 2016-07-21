@@ -5,7 +5,9 @@ const path = require('path')
   , winston = require('winston')
   , nconf = require('nconf')
   , TcpServer = require('./lib/tcp/tcp-server.js')
-  , ChatController = require('./lib/xle/chat.controller');
+  , ChatController = require('./lib/xle/chat.controller')
+  , ResponseController = require('./lib/xle/response/response.controller')
+  , DestinationController = require('./lib/xle/destination/destination.controller');
 
 
 const configPath = path.join(__dirname, 'config.yml');
@@ -28,6 +30,10 @@ nconf.defaults({
   },
   server: {
     port: 9000
+  },
+  destination: {
+    loop: true,
+    sequence: ['* 00001']
   }
 });
 
@@ -37,4 +43,12 @@ const tcpServer = new TcpServer({
   port: nconf.get('server:port')
 });
 
-const chatCtrl = new ChatController(tcpServer); 
+const destinationController = new DestinationController(nconf.get('destination'));
+
+const responseController = new ResponseController({
+  destination: destinationController
+});
+
+const chatController = new ChatController(tcpServer, {
+  response: responseController
+}); 
