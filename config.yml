@@ -1,11 +1,11 @@
 # server configuration
 server: 
-  port: 9001
+  port: 42300
 
 # logging configuration
 logger:
   # possible values: error, warn, info, debug, trace
-  level: 'info' 
+  level: 'debug' 
 
 destination:
   loop: true
