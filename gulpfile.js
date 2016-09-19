@@ -8,7 +8,8 @@ const gulp = require('gulp')
   , sinon = require('sinon')
   , sinonChai = require('sinon-chai')
   , path = require('path')
-  , winston = require('winston');
+  , winston = require('winston')
+  , proxyquire = require('proxyquire');
 
 chai.use(sinonChai);
 
@@ -16,8 +17,17 @@ function runMocha(done) {
   return function() {
     global.expect = chai.expect;
     global.sinon = sinon;
-    global.sut = function(sutPath) {
-      return require(path.join(__dirname, sutPath));
+
+    global.sut = function(id) {
+      return require(path.join(__dirname, id));
+    };
+
+    global.sutId = function sutId(id) {
+      return path.join(__dirname, id);
+    };
+
+    global.mock = function(id, stubs) {
+      return proxyquire(sutId(id), stubs);
     };
 
     var mochaOpts = {
@@ -30,10 +40,10 @@ function runMocha(done) {
       winston.remove(winston.transports.Console);
     }
 
-    var stream = gulp.src('test/lib/**/*spec.js')
+    var stream = gulp.src(['test/lib/**/*spec.js', 'test/lib/**/*e2e.js'])
       .pipe(plugins.mocha(mochaOpts));
 
-    if (yargs.argv.coverage) {
+    if (!yargs.argv.nocoverage) {
       stream.pipe(istanbul.writeReports({
         reporters: ['text', 'lcov', 'html'],
         reportOpts: {
@@ -47,7 +57,7 @@ function runMocha(done) {
 }
 
 gulp.task('test.node', function(done) {
-  if (yargs.argv.coverage) {
+  if (!yargs.argv.coverage) {
     gulp.src('lib/**/*.js')
       .pipe(istanbul({
         includeUntested: true

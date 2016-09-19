@@ -3,12 +3,7 @@
 const path = require('path')
   , fs = require('fs')
   , winston = require('winston')
-  , nconf = require('nconf')
-  , TcpServer = require('./lib/tcp/tcp-server.js')
-  , ChatController = require('./lib/xle/chat.controller')
-  , ResponseController = require('./lib/xle/response/response.controller')
-  , DestinationController = require('./lib/xle/destination/destination.controller');
-
+  , nconf = require('nconf');
 
 const configPath = path.join(__dirname, 'config.yml');
 
@@ -22,7 +17,6 @@ try {
 } catch(err) {
   // ignore
 }
-
 
 nconf.defaults({
   logger: {
@@ -39,16 +33,8 @@ nconf.defaults({
 
 winston.level = nconf.get('logger:level');
 
-const tcpServer = new TcpServer({
-  port: nconf.get('server:port')
-});
-
-const destinationController = new DestinationController(nconf.get('destination'));
-
-const responseController = new ResponseController({
-  destination: destinationController
-});
-
-const chatController = new ChatController(tcpServer, {
-  response: responseController
-}); 
+require('./lib/tcp/tcp-server');
+require('./lib/xle/receiver/receiver.controller');
+require('./lib/xle/client/identification.controller');
+require('./lib/xle/client/flagging.controller');
+require('./lib/xle/router/router.controller');

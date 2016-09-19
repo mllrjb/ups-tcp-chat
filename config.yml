@@ -7,8 +7,28 @@ logger:
   # possible values: error, warn, info, debug, trace
   level: 'debug' 
 
-destination:
-  loop: true
-  sequence:
-    - '5 00002,00003,00004'
-    - '* 00012,00013,00014'
+sender:
+  name: 192.168.17.11
+  type: XLE
+
+sort:
+  generator:
+    loop: true
+    maxDigest: 20
+  destination:
+    sequence:
+      - '5 00002,00003,00004'
+      - '* 00012,00013,00014'
+
+msgid:
+  moduleType: 'AS'
+  deviceNumber: 1
+  uniqueId:
+    start: 300
+    increment: 1
+
+pkguid:
+  cameraId: XYZ7890
+  uniqueId:
+    start: 300
+    increment: 10

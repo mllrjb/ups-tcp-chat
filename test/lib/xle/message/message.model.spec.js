@@ -1,6 +1,6 @@
 'use strict';
 
-const ChatMessage = sut('lib/xle/chat-message.model');
+const ChatMessage = sut('lib/xle/message/message.model');
 
 describe('ChatMessage', () => {
 
